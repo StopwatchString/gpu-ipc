@@ -9,7 +9,6 @@
 #include <iostream>
 #include <vector>
 #include <bit>
-#include <assert.h>
 
 struct D3DState
 {
