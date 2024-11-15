@@ -57,6 +57,9 @@
     <ClCompile Include="..\extern\glh\src\glad\wgl.c">
       <Filter>Source Files\glad</Filter>
     </ClCompile>
+    <ClCompile Include="..\extern\glh\src\glh\Texture2D.cpp">
+      <Filter>Source Files\glh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenGLApplication.h">
@@ -71,7 +74,7 @@
     <ClInclude Include="..\extern\glh\include\KHR\khrplatform.h">
       <Filter>Header Files\glh\KHR</Filter>
     </ClInclude>
-    <ClInclude Include="..\extern\glh\include\glh\debugWrappers.h">
+    <ClInclude Include="..\extern\glh\include\glh\functionWrappers.h">
       <Filter>Header Files\glh\glh</Filter>
     </ClInclude>
     <ClInclude Include="..\extern\glh\include\glh\glh.h">
@@ -103,6 +106,12 @@
     </ClInclude>
     <ClInclude Include="..\extern\cpputils\include\cpputils\windows\window_utils.h">
       <Filter>Header Files\cpputils\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\Texture2D.h">
+      <Filter>Header Files\glh\glh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\utils.h">
+      <Filter>Header Files\glh\glh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
