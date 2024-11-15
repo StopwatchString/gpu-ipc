@@ -135,10 +135,12 @@ int main(int argc, char argv[])
     appConfig.windowName = "Producer";
     appConfig.windowInitWidth = 1000;
     appConfig.windowInitHeight = 1000;
-    appConfig.windowPosX = 4120;
-    appConfig.windowPosY = 0;
+    appConfig.windowPosX = 4000;
+    appConfig.windowPosY = 100;
     appConfig.windowBorderless = false;
     appConfig.windowResizeEnable = false;
+    appConfig.windowDarkmode = true;
+    appConfig.windowRounded = true;
     appConfig.glVersionMajor = 4;
     appConfig.glVersionMinor = 6;
     appConfig.customDrawFunc = &draw;

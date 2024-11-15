@@ -101,5 +101,8 @@
     <ClInclude Include="..\extern\cpputils\include\cpputils\SharedMemory.h">
       <Filter>Header Files\cpputils</Filter>
     </ClInclude>
+    <ClInclude Include="..\extern\cpputils\include\cpputils\windows\window_utils.h">
+      <Filter>Header Files\cpputils\windows</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

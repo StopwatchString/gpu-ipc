@@ -113,7 +113,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3_mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,7 +134,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3_mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;Dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -149,6 +149,7 @@
     <ClInclude Include="..\extern\cpputils\include\cpputils\InterprocessMutexLockGuard.h" />
     <ClInclude Include="..\extern\cpputils\include\cpputils\SharedMemory.h" />
     <ClInclude Include="..\extern\cpputils\include\cpputils\windows\handle_utils.h" />
+    <ClInclude Include="..\extern\cpputils\include\cpputils\windows\window_utils.h" />
     <ClInclude Include="..\extern\glh\include\glad\gl.h" />
     <ClInclude Include="..\extern\glh\include\glad\glx.h" />
     <ClInclude Include="..\extern\glh\include\glad\wgl.h" />

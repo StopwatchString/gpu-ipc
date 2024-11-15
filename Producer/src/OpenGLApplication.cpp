@@ -92,10 +92,9 @@ void OpenGLApplication::initGLFW()
         throw std::runtime_error("ERROR OpenGLApplication::initGLFW() Could not create window!");
     }
 
-    if (appConfig.windowDarkmode) {
-        HWND hWnd = glfwGetWin32Window(glfwWindow);
-        HRESULT hr = setWindowDarkMode(hWnd);
-    }
+    HWND hWnd = glfwGetWin32Window(glfwWindow);
+    HRESULT hDarkModeResult = setWindowDarkMode(hWnd, appConfig.windowDarkmode);
+    HRESULT hRoundedResult = setWindowRoundedCorners(hWnd, appConfig.windowRounded);
 
     GLFWerrorfun errorCallback = appConfig.customErrorCallback == nullptr ? defaultErrorCallback : appConfig.customErrorCallback;
     glfwSetErrorCallback(errorCallback);
