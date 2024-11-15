@@ -24,6 +24,7 @@ public:
         int windowPosY           { 0 };
         bool windowBorderless    { false };
         bool windowResizeEnable  { false };
+        bool windowDarkmode      { false };
         int glVersionMajor       { 4 };
         int glVersionMinor       { 6 };
         std::function<void(GLFWwindow*)> customDrawFunc = nullptr;

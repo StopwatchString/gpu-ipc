@@ -1,5 +1,7 @@
 #include "OpenGLApplication.h"
 
+#include "cpputils/windows/window_utils.h"
+
 #include <iostream>
 #include <exception>
 
@@ -88,6 +90,11 @@ void OpenGLApplication::initGLFW()
     glfwWindow = glfwCreateWindow(appConfig.windowInitWidth, appConfig.windowInitHeight, appConfig.windowName.c_str(), nullptr, nullptr);
     if (glfwWindow == nullptr) {
         throw std::runtime_error("ERROR OpenGLApplication::initGLFW() Could not create window!");
+    }
+
+    if (appConfig.windowDarkmode) {
+        HWND hWnd = glfwGetWin32Window(glfwWindow);
+        HRESULT hr = setWindowDarkMode(hWnd);
     }
 
     GLFWerrorfun errorCallback = appConfig.customErrorCallback == nullptr ? defaultErrorCallback : appConfig.customErrorCallback;
