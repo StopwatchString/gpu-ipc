@@ -50,19 +50,15 @@ void draw(GLFWwindow* window) {
 
     D3DInteropTexture2D tex(100, 100, false);
 
-    // Create an alternate framebuffer to render to
-    GLuint framebuffer = 0;
-    glhGenFramebuffers(1, &framebuffer);
-    glhBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    Framebuffer framebuf;
+    framebuf.bind();
 
-    // Attach the texture to the framebuffer, such that writing to the framebuffer will write to the texture
     tex.interopLock();
-    glhFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.handle(), 0);
+    framebuf.setColorAttachment2D(GL_TEXTURE_2D, tex.handle());
     tex.interopUnlock();
 
-    // Check that the framebuffer is complete (ready to be used)
-    if (glhCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        throw std::runtime_error("Framebuffer is not complete!");
+    if (!framebuf.isComplete()) {
+        std::cout << "panic" << std::endl;
     }
 
     glEnable(GL_TEXTURE_2D);
@@ -70,13 +66,16 @@ void draw(GLFWwindow* window) {
     while (!glfwWindowShouldClose(window)) {
         // Render to the framebuffer/texture
         tex.interopLock();
-        glhBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        framebuf.bind();
+
         float sinVal = sinf((float)glfwGetTime()) * 0.5f + 0.5f;
         glhClearColor(sinVal, 0.0f, sinVal, 1.0f);
         glhClear(GL_COLOR_BUFFER_BIT);
 
         // Render to the screen framebuffer, drawing a triangle that uses the texture from the framebuffer
-        glhBindFramebuffer(GL_FRAMEBUFFER, 0);
+        framebuf.unbind();
+        
+        //glhBindFramebuffer(GL_FRAMEBUFFER, 0);
         glhClearColor(1.0, 0.0, 0.0, 1.0);
         glhClear(GL_COLOR_BUFFER_BIT);
 

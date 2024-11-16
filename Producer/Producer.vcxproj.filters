@@ -69,6 +69,9 @@
     <ClCompile Include="..\extern\glh\src\glh\classes\Texture2D.cpp">
       <Filter>Source Files\glh\classes</Filter>
     </ClCompile>
+    <ClCompile Include="..\extern\glh\src\glh\classes\Framebuffer.cpp">
+      <Filter>Source Files\glh\classes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenGLApplication.h">
@@ -129,6 +132,9 @@
       <Filter>Header Files\glh\glh\classes</Filter>
     </ClInclude>
     <ClInclude Include="..\extern\glh\include\glh\classes\Texture2D.h">
+      <Filter>Header Files\glh\glh\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\classes\Framebuffer.h">
       <Filter>Header Files\glh\glh\classes</Filter>
     </ClInclude>
   </ItemGroup>
