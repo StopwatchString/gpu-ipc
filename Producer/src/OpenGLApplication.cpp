@@ -1,6 +1,6 @@
 #include "OpenGLApplication.h"
 
-#include "cpputils/windows/window_utils.h"
+#include "cpputils/windows/dwm.h"
 
 #include <iostream>
 #include <exception>

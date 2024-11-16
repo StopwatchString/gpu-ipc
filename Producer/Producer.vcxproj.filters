@@ -107,7 +107,7 @@
     <ClInclude Include="..\extern\cpputils\include\cpputils\SharedMemory.h">
       <Filter>Header Files\cpputils</Filter>
     </ClInclude>
-    <ClInclude Include="..\extern\cpputils\include\cpputils\windows\window_utils.h">
+    <ClInclude Include="..\extern\cpputils\include\cpputils\windows\dwm.h">
       <Filter>Header Files\cpputils\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\extern\glh\include\glh\Texture2D.h">
@@ -118,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="..\extern\glh\include\glh\D3DInteropTexture2D.h">
       <Filter>Header Files\glh\glh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extern\cpputils\include\cpputils\SharedLibraryLoader.h">
+      <Filter>Header Files\cpputils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
