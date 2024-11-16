@@ -122,5 +122,8 @@
     <ClInclude Include="..\extern\cpputils\include\cpputils\SharedLibraryLoader.h">
       <Filter>Header Files\cpputils</Filter>
     </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\SharedLibraryLoader.h">
+      <Filter>Header Files\glh\glh</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

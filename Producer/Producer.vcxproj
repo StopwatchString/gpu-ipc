@@ -160,6 +160,7 @@
     <ClInclude Include="..\extern\glh\include\glh\functionWrappers.h" />
     <ClInclude Include="..\extern\glh\include\glh\glh.h" />
     <ClInclude Include="..\extern\glh\include\glh\macros.h" />
+    <ClInclude Include="..\extern\glh\include\glh\SharedLibraryLoader.h" />
     <ClInclude Include="..\extern\glh\include\glh\Texture2D.h" />
     <ClInclude Include="..\extern\glh\include\glh\utils.h" />
     <ClInclude Include="..\extern\glh\include\KHR\khrplatform.h" />
