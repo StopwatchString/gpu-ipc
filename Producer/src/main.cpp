@@ -14,7 +14,7 @@
 OpenGLApplication::ApplicationConfig appConfig{};
 
 constexpr int moveFactor = 100;
-float spacing = 1.0f;
+float size = 10.0f;
 void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
 
     bool pressed = action == GLFW_PRESS;
@@ -28,13 +28,13 @@ void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int 
         glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE);
     }
 
-    if (key == GLFW_KEY_LEFT && pressed) {
-        spacing -= 0.2f;
-        if (spacing < 0.0f) spacing = 0.0f;
+    if (key == GLFW_KEY_LEFT && pressedOrHeld) {
+        size -= 2.0f;
+        if (size < 1.0f) size = 2.0f;
     }
 
-    if (key == GLFW_KEY_RIGHT && pressed) {
-        spacing += 0.2f;
+    if (key == GLFW_KEY_RIGHT && pressedOrHeld) {
+        size += 2.0f;
     }
 
     if (key == GLFW_KEY_LEFT && pressedOrHeld && ctrl) {
@@ -115,10 +115,7 @@ void draw(GLFWwindow* window) {
 
         tex.interopUnlock();
 
-        std::string text = "Press space to toggle color";
-        glhDrawText(text, 0, 0);
-        glhSetTextColor(1.0, 0.0, 0.0, 1.0);
-        glhDrawText(text, 0, 120);
+        glhDrawText(std::to_string(glfwGetTime()), 0, 0, size);
 
         glhErrorCheck("End of Render");
         glfwSwapBuffers(window);
