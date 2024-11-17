@@ -4,8 +4,6 @@
 #include "GLFW/glfw3.h"
 
 #include "glh/glh.h"
-#define RFONT_IMPLEMENTATION
-#include "glh/RFont/RFont.h"
 
 #include "directx_utils.h"
 #include "cpputils/windows/handle_utils.h"
@@ -16,6 +14,7 @@
 OpenGLApplication::ApplicationConfig appConfig{};
 
 constexpr int moveFactor = 100;
+float spacing = 1.0f;
 void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
 
     bool pressed = action == GLFW_PRESS;
@@ -27,6 +26,15 @@ void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int 
 
     if (key == GLFW_KEY_ESCAPE && pressed) {
         glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE);
+    }
+
+    if (key == GLFW_KEY_LEFT && pressed) {
+        spacing -= 0.2f;
+        if (spacing < 0.0f) spacing = 0.0f;
+    }
+
+    if (key == GLFW_KEY_RIGHT && pressed) {
+        spacing += 0.2f;
     }
 
     if (key == GLFW_KEY_LEFT && pressedOrHeld && ctrl) {
@@ -67,8 +75,7 @@ void draw(GLFWwindow* window) {
     framebuf.setColorAttachment2D(GL_TEXTURE_2D, tex.handle());
     tex.interopUnlock();
 
-    RFont_init(appConfig.windowInitWidth, appConfig.windowInitHeight);
-    RFont_font* font = RFont_font_init("DejaVuSans.ttf");
+    glhInitFont(appConfig.windowInitWidth, appConfig.windowInitHeight);
 
     if (!framebuf.isComplete()) {
         std::cout << "panic" << std::endl;
@@ -108,12 +115,11 @@ void draw(GLFWwindow* window) {
 
         tex.interopUnlock();
 
-        //std::string text = "Press space to toggle color";
+        std::string text = "Press space to toggle color";
         //RFont_draw_text(font, text.c_str(), 0, 0, text.size());
-        RFont_draw_text(font, "abcdefghijklmnopqrstuvwxyz\n1234567890@.<>,/?\\|[{]}", 0, 0, 60);
-        RFont_draw_text_spacing(font, "`~!#$%^&*()_-=+", 0, 120, 60, 1.0f);
-        RFont_set_color(1.0f, 0.0f, 0, 1.0f);
-        RFont_draw_text(font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nSomething about a fast lazy dog.", 0, 210, 20);
+        glhDrawText(text, 0, 0);
+        glhSetTextColor(1.0, 0.0, 0.0, 1.0);
+        glhDrawText(text, 0, 120);
         glEnable(GL_TEXTURE_2D);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
@@ -121,7 +127,7 @@ void draw(GLFWwindow* window) {
         glhErrorCheck("End of Render");
         glfwSwapBuffers(window);
     }
-    RFont_font_free(font);
+    glhFreeFont();
     D3DInteropTexture2D::shutdownDirect3D();
 }
 

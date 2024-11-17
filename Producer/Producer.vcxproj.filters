@@ -75,6 +75,9 @@
     <ClCompile Include="..\extern\glh\src\glh\classes\Framebuffer.cpp">
       <Filter>Source Files\glh\classes</Filter>
     </ClCompile>
+    <ClCompile Include="..\extern\glh\src\glh\font.cpp">
+      <Filter>Source Files\glh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenGLApplication.h">
@@ -144,6 +147,12 @@
       <Filter>Header Files\glh\glh</Filter>
     </ClInclude>
     <ClInclude Include="..\extern\glh\include\glh\RFont\RFont.h">
+      <Filter>Header Files\glh\glh\RFont</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\RFont\DejaVuSans.h">
+      <Filter>Header Files\glh\glh\RFont</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\RFont\DroidSansJapanese.h">
       <Filter>Header Files\glh\glh\RFont</Filter>
     </ClInclude>
   </ItemGroup>
