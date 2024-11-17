@@ -4,6 +4,8 @@
 #include "GLFW/glfw3.h"
 
 #include "glh/glh.h"
+#define RFONT_IMPLEMENTATION
+#include "glh/RFont/RFont.h"
 
 #include "directx_utils.h"
 #include "cpputils/windows/handle_utils.h"
@@ -16,29 +18,36 @@ OpenGLApplication::ApplicationConfig appConfig{};
 constexpr int moveFactor = 100;
 void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
 
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    bool pressed = action == GLFW_PRESS;
+    bool pressedOrHeld = action == GLFW_PRESS || action == GLFW_REPEAT;
+    bool ctrl = mods == GLFW_MOD_CONTROL;
+    bool shiftCtrl = (mods & GLFW_MOD_SHIFT) && (mods & GLFW_MOD_CONTROL);
+
+    if (shiftCtrl) std::cout << "shiftCtrl" << std::endl;
+
+    if (key == GLFW_KEY_ESCAPE && pressed) {
         glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE);
     }
 
-    if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_LEFT && pressedOrHeld && ctrl) {
         int xPos, yPos;
         glfwGetWindowPos(glfwWindow, &xPos, &yPos);
         glfwSetWindowPos(glfwWindow, xPos - moveFactor, yPos);
     }
 
-    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_RIGHT && pressedOrHeld && ctrl) {
         int xPos, yPos;
         glfwGetWindowPos(glfwWindow, &xPos, &yPos);
         glfwSetWindowPos(glfwWindow, xPos + moveFactor, yPos);
     }
 
-    if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_UP && pressedOrHeld && ctrl) {
         int xPos, yPos;
         glfwGetWindowPos(glfwWindow, &xPos, &yPos);
         glfwSetWindowPos(glfwWindow, xPos, yPos - moveFactor);
     }
 
-    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_DOWN && pressedOrHeld && ctrl) {
         int xPos, yPos;
         glfwGetWindowPos(glfwWindow, &xPos, &yPos);
         glfwSetWindowPos(glfwWindow, xPos, yPos + moveFactor);
@@ -47,6 +56,7 @@ void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int 
 
 void draw(GLFWwindow* window) {
     glfwMakeContextCurrent(window);
+    D3DInteropTexture2D::initDirect3D();
 
     D3DInteropTexture2D tex(100, 100, false);
 
@@ -56,6 +66,9 @@ void draw(GLFWwindow* window) {
     tex.interopLock();
     framebuf.setColorAttachment2D(GL_TEXTURE_2D, tex.handle());
     tex.interopUnlock();
+
+    RFont_init(appConfig.windowInitWidth, appConfig.windowInitHeight);
+    RFont_font* font = RFont_font_init("DejaVuSans.ttf");
 
     if (!framebuf.isComplete()) {
         std::cout << "panic" << std::endl;
@@ -76,7 +89,7 @@ void draw(GLFWwindow* window) {
         framebuf.unbind();
         
         //glhBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glhClearColor(1.0, 0.0, 0.0, 1.0);
+        glhClearColor(.2, 0.3, 0.4, 1.0);
         glhClear(GL_COLOR_BUFFER_BIT);
 
         tex.bind();
@@ -95,9 +108,21 @@ void draw(GLFWwindow* window) {
 
         tex.interopUnlock();
 
+        //std::string text = "Press space to toggle color";
+        //RFont_draw_text(font, text.c_str(), 0, 0, text.size());
+        RFont_draw_text(font, "abcdefghijklmnopqrstuvwxyz\n1234567890@.<>,/?\\|[{]}", 0, 0, 60);
+        RFont_draw_text_spacing(font, "`~!#$%^&*()_-=+", 0, 120, 60, 1.0f);
+        RFont_set_color(1.0f, 0.0f, 0, 1.0f);
+        RFont_draw_text(font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nSomething about a fast lazy dog.", 0, 210, 20);
+        glEnable(GL_TEXTURE_2D);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+
         glhErrorCheck("End of Render");
         glfwSwapBuffers(window);
     }
+    RFont_font_free(font);
+    D3DInteropTexture2D::shutdownDirect3D();
 }
 
 int main(int argc, char argv[])
@@ -105,7 +130,7 @@ int main(int argc, char argv[])
     appConfig.windowName = "Producer";
     appConfig.windowInitWidth = 1000;
     appConfig.windowInitHeight = 1000;
-    appConfig.windowPosX = 4000;
+    appConfig.windowPosX = 200;
     appConfig.windowPosY = 100;
     appConfig.windowBorderless = false;
     appConfig.windowResizeEnable = false;
