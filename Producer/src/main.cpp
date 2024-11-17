@@ -14,26 +14,27 @@
 OpenGLApplication::ApplicationConfig appConfig{};
 
 constexpr int moveFactor = 100;
-float size = 10.0f;
+float size = 20.0f;
 void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
 
     bool pressed = action == GLFW_PRESS;
     bool pressedOrHeld = action == GLFW_PRESS || action == GLFW_REPEAT;
-    bool ctrl = mods == GLFW_MOD_CONTROL;
-    bool shiftCtrl = (mods & GLFW_MOD_SHIFT) && (mods & GLFW_MOD_CONTROL);
+    bool ctrl = mods & GLFW_MOD_CONTROL;
+    bool shift = mods & GLFW_MOD_SHIFT;
+    bool alt = mods & GLFW_MOD_ALT;
+    bool noMod = !ctrl && !shift && !alt;
 
-    if (shiftCtrl) std::cout << "shiftCtrl" << std::endl;
 
     if (key == GLFW_KEY_ESCAPE && pressed) {
         glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE);
     }
 
-    if (key == GLFW_KEY_LEFT && pressedOrHeld) {
+    if (key == GLFW_KEY_LEFT && pressedOrHeld && shift) {
         size -= 2.0f;
         if (size < 1.0f) size = 2.0f;
     }
 
-    if (key == GLFW_KEY_RIGHT && pressedOrHeld) {
+    if (key == GLFW_KEY_RIGHT && pressedOrHeld && shift) {
         size += 2.0f;
     }
 
@@ -116,6 +117,14 @@ void draw(GLFWwindow* window) {
         tex.interopUnlock();
 
         glhDrawText(std::to_string(glfwGetTime()), 0, 0, size);
+        
+        std::string moveText = "Ctrl+Arrow Keys to move window";
+        FontRect moveTextRect = glhGetTextSize(moveText, size);
+        glhDrawText(moveText, appConfig.windowInitWidth - moveTextRect.width, 0, size);
+
+        std::string scaleText = "Shift+Arrow Keys to scale text";
+        FontRect scaleTextRect = glhGetTextSize(scaleText, size);
+        glhDrawText(scaleText, appConfig.windowInitWidth - scaleTextRect.width, moveTextRect.height, size);
 
         glhErrorCheck("End of Render");
         glfwSwapBuffers(window);
