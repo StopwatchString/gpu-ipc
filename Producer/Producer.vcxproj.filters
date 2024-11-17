@@ -46,6 +46,9 @@
     <Filter Include="Source Files\glh\classes">
       <UniqueIdentifier>{a55f8a11-20bb-4a65-a4e1-ebaec6acf328}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\glh\glh\RFont">
+      <UniqueIdentifier>{4b0264fb-a625-40d5-a2d2-2744ee8a83f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\directx_utils.h">
@@ -136,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="..\extern\glh\include\glh\classes\Framebuffer.h">
       <Filter>Header Files\glh\glh\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\font.h">
+      <Filter>Header Files\glh\glh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\RFont\RFont.h">
+      <Filter>Header Files\glh\glh\RFont</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

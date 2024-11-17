@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)..\extern\cpputils\include;$(SolutionDir)..\extern\glh\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -122,7 +122,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)..\extern\cpputils\include;$(SolutionDir)..\extern\glh\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -161,9 +161,11 @@
     <ClInclude Include="..\extern\glh\include\glh\classes\Framebuffer.h" />
     <ClInclude Include="..\extern\glh\include\glh\classes\SharedLibraryLoader.h" />
     <ClInclude Include="..\extern\glh\include\glh\classes\Texture2D.h" />
+    <ClInclude Include="..\extern\glh\include\glh\font.h" />
     <ClInclude Include="..\extern\glh\include\glh\functionWrappers.h" />
     <ClInclude Include="..\extern\glh\include\glh\glh.h" />
     <ClInclude Include="..\extern\glh\include\glh\macros.h" />
+    <ClInclude Include="..\extern\glh\include\glh\RFont\RFont.h" />
     <ClInclude Include="..\extern\glh\include\glh\utils.h" />
     <ClInclude Include="..\extern\glh\include\KHR\khrplatform.h" />
     <ClInclude Include="include\GLFW\glfw3.h" />
