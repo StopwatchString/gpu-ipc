@@ -142,6 +142,8 @@
     <ClCompile Include="..\extern\glh\src\glad\wgl.c" />
     <ClCompile Include="..\extern\glh\src\glh\classes\D3DInteropTexture2D.cpp" />
     <ClCompile Include="..\extern\glh\src\glh\classes\Framebuffer.cpp" />
+    <ClCompile Include="..\extern\glh\src\glh\classes\Program.cpp" />
+    <ClCompile Include="..\extern\glh\src\glh\classes\Shader.cpp" />
     <ClCompile Include="..\extern\glh\src\glh\classes\Texture2D.cpp" />
     <ClCompile Include="..\extern\glh\src\glh\font.cpp" />
     <ClCompile Include="include\directx_utils.h" />
@@ -160,6 +162,8 @@
     <ClInclude Include="..\extern\glh\include\glad\wgl.h" />
     <ClInclude Include="..\extern\glh\include\glh\classes\D3DInteropTexture2D.h" />
     <ClInclude Include="..\extern\glh\include\glh\classes\Framebuffer.h" />
+    <ClInclude Include="..\extern\glh\include\glh\classes\Program.h" />
+    <ClInclude Include="..\extern\glh\include\glh\classes\Shader.h" />
     <ClInclude Include="..\extern\glh\include\glh\classes\SharedLibraryLoader.h" />
     <ClInclude Include="..\extern\glh\include\glh\classes\Texture2D.h" />
     <ClInclude Include="..\extern\glh\include\glh\font.h" />

@@ -78,6 +78,12 @@
     <ClCompile Include="..\extern\glh\src\glh\font.cpp">
       <Filter>Source Files\glh</Filter>
     </ClCompile>
+    <ClCompile Include="..\extern\glh\src\glh\classes\Program.cpp">
+      <Filter>Source Files\glh\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\extern\glh\src\glh\classes\Shader.cpp">
+      <Filter>Source Files\glh\classes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OpenGLApplication.h">
@@ -157,6 +163,12 @@
     </ClInclude>
     <ClInclude Include="..\extern\glh\include\glh\openglapi.h">
       <Filter>Header Files\glh\glh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\classes\Program.h">
+      <Filter>Header Files\glh\glh\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\classes\Shader.h">
+      <Filter>Header Files\glh\glh\classes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

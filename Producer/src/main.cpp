@@ -5,83 +5,128 @@
 #include "OpenGLApplication.h"
 
 #include <iostream>
+#include <chrono>
 #include <array>
+#include <numeric>
 
 OpenGLApplication::ApplicationConfig appConfig{};
 
-constexpr int moveFactor = 100;
+constexpr int MOVE_FACTOR = 100;
+constexpr int FRAMETIME_ROLLING_AVG_SAMPLE_SIZE = 100;
+
 float size = 20.0f;
+
+class KeyState {
+public:
+    KeyState(int inKey) : key(inKey) {}
+    void update(int inKey, int inAction) {
+        if (key == inKey) {
+            if (inAction == GLFW_PRESS) {
+                active = true;
+            }
+            else if (inAction == GLFW_RELEASE) {
+                active = false;
+            }
+        }
+    }
+    bool isActive() { return active; }
+
+private:
+    int key;
+    bool active;
+};
+
 void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
 
-    bool pressed = action == GLFW_PRESS;
-    bool pressedOrHeld = action == GLFW_PRESS || action == GLFW_REPEAT;
+    static KeyState left(GLFW_KEY_LEFT);
+    static KeyState right(GLFW_KEY_RIGHT);
+    static KeyState up(GLFW_KEY_UP);
+    static KeyState down(GLFW_KEY_DOWN);
+
+    left.update(key, action);
+    right.update(key, action);
+    up.update(key, action);
+    down.update(key, action);
+
     bool ctrl = mods & GLFW_MOD_CONTROL;
     bool shift = mods & GLFW_MOD_SHIFT;
     bool alt = mods & GLFW_MOD_ALT;
     bool noMod = !ctrl && !shift && !alt;
 
 
-    if (key == GLFW_KEY_ESCAPE && pressed) {
+    if (key == GLFW_KEY_ESCAPE && (action == GLFW_PRESS)) {
         glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE);
     }
 
-    if (key == GLFW_KEY_LEFT && pressedOrHeld && shift) {
+    if (left.isActive() && shift) {
         size -= 2.0f;
         if (size < 1.0f) size = 2.0f;
     }
 
-    if (key == GLFW_KEY_RIGHT && pressedOrHeld && shift) {
+    if (right.isActive() && shift) {
         size += 2.0f;
     }
 
-    if (key == GLFW_KEY_LEFT && pressedOrHeld && ctrl) {
+    if (left.isActive() && ctrl) {
         int xPos, yPos;
         glfwGetWindowPos(glfwWindow, &xPos, &yPos);
-        glfwSetWindowPos(glfwWindow, xPos - moveFactor, yPos);
+        glfwSetWindowPos(glfwWindow, xPos - MOVE_FACTOR, yPos);
     }
 
-    if (key == GLFW_KEY_RIGHT && pressedOrHeld && ctrl) {
+    if (right.isActive() && ctrl) {
         int xPos, yPos;
         glfwGetWindowPos(glfwWindow, &xPos, &yPos);
-        glfwSetWindowPos(glfwWindow, xPos + moveFactor, yPos);
+        glfwSetWindowPos(glfwWindow, xPos + MOVE_FACTOR, yPos);
     }
 
-    if (key == GLFW_KEY_UP && pressedOrHeld && ctrl) {
+    if (up.isActive() && ctrl) {
         int xPos, yPos;
         glfwGetWindowPos(glfwWindow, &xPos, &yPos);
-        glfwSetWindowPos(glfwWindow, xPos, yPos - moveFactor);
+        glfwSetWindowPos(glfwWindow, xPos, yPos - MOVE_FACTOR);
     }
 
-    if (key == GLFW_KEY_DOWN && pressedOrHeld && ctrl) {
+    if (down.isActive() && ctrl) {
         int xPos, yPos;
         glfwGetWindowPos(glfwWindow, &xPos, &yPos);
-        glfwSetWindowPos(glfwWindow, xPos, yPos + moveFactor);
+        glfwSetWindowPos(glfwWindow, xPos, yPos + MOVE_FACTOR);
     }
+}
+
+std::string doubleToString(double val, size_t precision) {
+    std::string str = std::to_string(val);
+    int dec = str.find('.');
+    return str.substr(0, dec + precision + 1);
 }
 
 void draw(GLFWwindow* window) {
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(0);
+
     D3DInteropTexture2D::initDirect3D();
+    glhInitFont(appConfig.windowInitWidth, appConfig.windowInitHeight);
 
     D3DInteropTexture2D tex(100, 100, false);
+    tex.interopLock(); // Leave it locked forever, until destruction
 
     Framebuffer framebuf;
     framebuf.bind();
 
-    tex.interopLock();
     framebuf.setColorAttachment2D(GL_TEXTURE_2D, tex.handle());
+
     tex.interopUnlock();
 
-    glhInitFont(appConfig.windowInitWidth, appConfig.windowInitHeight);
-
     if (!framebuf.isComplete()) {
-        std::cout << "panic" << std::endl;
+        std::cout << "ERROR draw() Framebuffer is incomplete! Rendering will fail." << std::endl;
     }
 
     glEnable(GL_TEXTURE_2D);
 
+    size_t writeIndex = 0;
+    std::array<double, FRAMETIME_ROLLING_AVG_SAMPLE_SIZE> frametimeMsTimings;
+
     while (!glfwWindowShouldClose(window)) {
-        // Render to the framebuffer/texture
+        auto begin = std::chrono::high_resolution_clock::now();
+
         tex.interopLock();
         framebuf.bind();
 
@@ -89,14 +134,13 @@ void draw(GLFWwindow* window) {
         glhClearColor(sinVal, 0.0f, sinVal, 1.0f);
         glhClear(GL_COLOR_BUFFER_BIT);
 
-        // Render to the screen framebuffer, drawing a triangle that uses the texture from the framebuffer
-        framebuf.unbind();
-        
-        //glhBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glhClearColor(.2, 0.3, 0.4, 1.0);
+        framebuf.unbind(); // Binds default framebuffer
+
+        glhClearColor(0.2f, 0.3f, 0.4f, 1.0f);
         glhClear(GL_COLOR_BUFFER_BIT);
 
         tex.bind();
+
         glhBegin(GL_TRIANGLES);
 
         glhTexCoord2f(0.0f, 0.0f);
@@ -112,7 +156,13 @@ void draw(GLFWwindow* window) {
 
         tex.interopUnlock();
 
-        glhDrawText(std::to_string(glfwGetTime()), 0, 0, size);
+        std::string timeStr = doubleToString(glfwGetTime(), 2) + "s";
+        FontRect timeRect = glhDrawText(timeStr, 0, 0, size);
+
+        double total = std::accumulate(std::begin(frametimeMsTimings), std::end(frametimeMsTimings), 0);
+        double frametimeMsAvg = total / frametimeMsTimings.size();
+        std::string frametimeStr = doubleToString(frametimeMsAvg, 2) + " frametime (ms)";
+        glhDrawText(frametimeStr, 0, timeRect.height, size);
         
         std::string moveText = "Ctrl+Arrow Keys to move window";
         FontRect moveTextRect = glhGetTextSize(moveText, size);
@@ -123,6 +173,15 @@ void draw(GLFWwindow* window) {
         glhDrawText(scaleText, appConfig.windowInitWidth - scaleTextRect.width, moveTextRect.height, size);
 
         glhErrorCheck("End of Render");
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = end - begin;
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+
+        frametimeMsTimings[writeIndex] = ms;
+        writeIndex++;
+        writeIndex %= FRAMETIME_ROLLING_AVG_SAMPLE_SIZE;
+
         glfwSwapBuffers(window);
     }
     glhFreeFont();
