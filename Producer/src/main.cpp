@@ -1,12 +1,8 @@
-#include "OpenGLApplication.h"
-
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
-
 #include "glh/glh.h"
 
-#include "directx_utils.h"
-#include "cpputils/windows/handle_utils.h"
+#include "OpenGLApplication.h"
 
 #include <iostream>
 #include <array>
