@@ -166,6 +166,7 @@
     <ClInclude Include="..\extern\glh\include\glh\functionWrappers.h" />
     <ClInclude Include="..\extern\glh\include\glh\glh.h" />
     <ClInclude Include="..\extern\glh\include\glh\macros.h" />
+    <ClInclude Include="..\extern\glh\include\glh\openglapi.h" />
     <ClInclude Include="..\extern\glh\include\glh\RFont\DejaVuSans.h" />
     <ClInclude Include="..\extern\glh\include\glh\RFont\DroidSansJapanese.h" />
     <ClInclude Include="..\extern\glh\include\glh\RFont\RFont.h" />

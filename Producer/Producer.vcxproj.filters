@@ -155,5 +155,8 @@
     <ClInclude Include="..\extern\glh\include\glh\RFont\DroidSansJapanese.h">
       <Filter>Header Files\glh\glh\RFont</Filter>
     </ClInclude>
+    <ClInclude Include="..\extern\glh\include\glh\openglapi.h">
+      <Filter>Header Files\glh\glh</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

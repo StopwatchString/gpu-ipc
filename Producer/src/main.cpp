@@ -116,13 +116,9 @@ void draw(GLFWwindow* window) {
         tex.interopUnlock();
 
         std::string text = "Press space to toggle color";
-        //RFont_draw_text(font, text.c_str(), 0, 0, text.size());
         glhDrawText(text, 0, 0);
         glhSetTextColor(1.0, 0.0, 0.0, 1.0);
         glhDrawText(text, 0, 120);
-        glEnable(GL_TEXTURE_2D);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
 
         glhErrorCheck("End of Render");
         glfwSwapBuffers(window);
