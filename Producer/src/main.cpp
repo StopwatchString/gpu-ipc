@@ -2,6 +2,7 @@
 #include "GLFW/glfw3.h"
 #include "glh/glh.h"
 
+#include "cpputils/SharedMemory.h"
 #include "OpenGLApplication.h"
 
 #include <iostream>
@@ -98,6 +99,12 @@ std::string doubleToString(double val, size_t precision) {
     return str.substr(0, dec + precision + 1);
 }
 
+struct d3dshare {
+    DWORD sourceProcessId{ NULL };
+    HANDLE sourceProcessShareHandle{ NULL };
+    bool ready{ false };
+};
+
 void draw(GLFWwindow* window) {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
@@ -105,21 +112,16 @@ void draw(GLFWwindow* window) {
     D3DInteropTexture2D::initDirect3D();
     glhInitFont(appConfig.windowInitWidth, appConfig.windowInitHeight);
 
-    D3DInteropTexture2D tex(100, 100, false);
-    tex.interopLock(); // Leave it locked forever, until destruction
+    D3DInteropTexture2D d3dTex(appConfig.windowInitWidth, appConfig.windowInitHeight, false);
 
-    Framebuffer framebuf;
-    framebuf.bind();
-
-    framebuf.setColorAttachment2D(GL_TEXTURE_2D, tex.handle());
-
-    tex.interopUnlock();
-
-    if (!framebuf.isComplete()) {
-        std::cout << "ERROR draw() Framebuffer is incomplete! Rendering will fail." << std::endl;
-    }
-
-    glEnable(GL_TEXTURE_2D);
+    d3dshare share;
+    share.sourceProcessId = GetCurrentProcessId();
+    share.sourceProcessShareHandle = d3dTex.d3dTextureSharedResourceHandle();
+    share.ready = true;
+    SharedMemory d3dshare("d3dshare", sizeof(d3dshare));
+    memcpy(d3dshare.data(), &share, sizeof(d3dshare));
+    std::cout << "Published sourceProcessId: " << share.sourceProcessId << std::endl;
+    std::cout << "Published sourceProcessShareHandle: " << share.sourceProcessShareHandle << std::endl;
 
     size_t writeIndex = 0;
     std::array<double, FRAMETIME_ROLLING_AVG_SAMPLE_SIZE> frametimeMsTimings;
@@ -127,34 +129,22 @@ void draw(GLFWwindow* window) {
     while (!glfwWindowShouldClose(window)) {
         auto begin = std::chrono::high_resolution_clock::now();
 
-        tex.interopLock();
-        framebuf.bind();
-
-        float sinVal = sinf((float)glfwGetTime()) * 0.5f + 0.5f;
-        glhClearColor(sinVal, 0.0f, sinVal, 1.0f);
-        glhClear(GL_COLOR_BUFFER_BIT);
-
-        framebuf.unbind(); // Binds default framebuffer
-
         glhClearColor(0.2f, 0.3f, 0.4f, 1.0f);
         glhClear(GL_COLOR_BUFFER_BIT);
 
-        tex.bind();
-
+        float sinVal = sinf((float)glfwGetTime()*5.0f) * 0.5f + 0.5f;
         glhBegin(GL_TRIANGLES);
 
-        glhTexCoord2f(0.0f, 0.0f);
+        glColor4d(1.0f, sinVal, 0.0f, 1.0f);
         glhVertex2f(-1.0f, -1.0f);
 
-        glhTexCoord2f(0.0f, 1.0f);
+        glColor4d(0.0f, 1.0f, 1.0f - sinVal, 1.0f);
         glhVertex2f(0.0f, 1.0f);
 
-        glhTexCoord2f(1.0f, 0.0f);
+        glColor4d(0.0f, 0.0f, 1.0f, 1.0f);
         glhVertex2f(1.0f, 0.0f);
 
         glhEnd();
-
-        tex.interopUnlock();
 
         std::string timeStr = doubleToString(glfwGetTime(), 2) + "s";
         FontRect timeRect = glhDrawText(timeStr, 0, 0, size);
@@ -171,6 +161,10 @@ void draw(GLFWwindow* window) {
         std::string scaleText = "Shift+Arrow Keys to scale text";
         FontRect scaleTextRect = glhGetTextSize(scaleText, size);
         glhDrawText(scaleText, appConfig.windowInitWidth - scaleTextRect.width, moveTextRect.height, size);
+
+        d3dTex.interopLock();
+        glCopyTextureSubImage2D(d3dTex.openGLHandle(), 0, 0, 0, 0, 0, d3dTex.width(), d3dTex.height());
+        d3dTex.interopUnlock();
 
         glhErrorCheck("End of Render");
 

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{37d8ce15-690b-4c14-b980-4df69fb61ec1}</ProjectGuid>
-    <RootNamespace>Producer</RootNamespace>
+    <ProjectGuid>{ebea0593-796b-4e34-bca4-b38d0ab2b0b9}</ProjectGuid>
+    <RootNamespace>Consumer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -105,15 +105,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)..\extern\cpputils\include;$(SolutionDir)..\extern\glh\include</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -125,8 +124,8 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)..\extern\cpputils\include;$(SolutionDir)..\extern\glh\include</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,30 +133,17 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\extern\glh\src\glad\gl.c" />
-    <ClCompile Include="..\extern\glh\src\glad\wgl.c" />
-    <ClCompile Include="..\extern\glh\src\glh\classes\D3DInteropTexture2D.cpp" />
-    <ClCompile Include="..\extern\glh\src\glh\classes\Framebuffer.cpp" />
-    <ClCompile Include="..\extern\glh\src\glh\classes\Program.cpp" />
-    <ClCompile Include="..\extern\glh\src\glh\classes\Shader.cpp" />
-    <ClCompile Include="..\extern\glh\src\glh\classes\Texture2D.cpp" />
-    <ClCompile Include="..\extern\glh\src\glh\font.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\OpenGLApplication.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\extern\cpputils\include\cpputils\SharedLibraryLoader.h" />
     <ClInclude Include="..\extern\cpputils\include\cpputils\InterprocessMutex.h" />
     <ClInclude Include="..\extern\cpputils\include\cpputils\InterprocessMutexLockGuard.h" />
+    <ClInclude Include="..\extern\cpputils\include\cpputils\SharedLibraryLoader.h" />
     <ClInclude Include="..\extern\cpputils\include\cpputils\SharedMemory.h" />
-    <ClInclude Include="..\extern\cpputils\include\cpputils\windows\handle_utils.h" />
     <ClInclude Include="..\extern\cpputils\include\cpputils\windows\dwm.h" />
+    <ClInclude Include="..\extern\cpputils\include\cpputils\windows\handle_utils.h" />
     <ClInclude Include="..\extern\glh\include\glad\gl.h" />
-    <ClInclude Include="..\extern\glh\include\glad\glx.h" />
     <ClInclude Include="..\extern\glh\include\glad\wgl.h" />
     <ClInclude Include="..\extern\glh\include\glh\classes\D3DInteropTexture2D.h" />
     <ClInclude Include="..\extern\glh\include\glh\classes\Framebuffer.h" />
@@ -178,6 +164,18 @@
     <ClInclude Include="include\GLFW\glfw3.h" />
     <ClInclude Include="include\GLFW\glfw3native.h" />
     <ClInclude Include="include\OpenGLApplication.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\extern\glh\src\glad\gl.c" />
+    <ClCompile Include="..\extern\glh\src\glad\wgl.c" />
+    <ClCompile Include="..\extern\glh\src\glh\classes\D3DInteropTexture2D.cpp" />
+    <ClCompile Include="..\extern\glh\src\glh\classes\Framebuffer.cpp" />
+    <ClCompile Include="..\extern\glh\src\glh\classes\Program.cpp" />
+    <ClCompile Include="..\extern\glh\src\glh\classes\Shader.cpp" />
+    <ClCompile Include="..\extern\glh\src\glh\classes\Texture2D.cpp" />
+    <ClCompile Include="..\extern\glh\src\glh\font.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\OpenGLApplication.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -51,9 +51,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\directx_utils.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\OpenGLApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
