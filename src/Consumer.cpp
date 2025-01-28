@@ -2,7 +2,7 @@
 #include "GLFW/glfw3.h"
 #include "glh/glh.h"
 
-#include "OpenGLApplication.h"
+#include "glh/classes/OpenGLApplication.h"
 #include "cpputils/SharedMemory.h"
 #include "cpputils/SharedLibraryLoader.h"
 #include "cpputils/windows/handle_utils.h"
@@ -127,20 +127,20 @@ void draw(GLFWwindow* window) {
 
     d3dshare share;
     while (!share.ready) {
-        SharedMemory d3dshare("d3dshare", sizeof(d3dshare));
+        cpputils::SharedMemory d3dshare("d3dshare", sizeof(d3dshare));
         memcpy(&share, d3dshare.data(), sizeof(d3dshare));
         if (!share.ready) {
             std::cout << "Waiting for data to be populated..." << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
-    HANDLE localShareHandle = duplicateHandle(share.sourceProcessId, share.sourceProcessShareHandle);
+    HANDLE localShareHandle = cpputils::windows::duplicateHandle(share.sourceProcessId, share.sourceProcessShareHandle);
     std::cout << "Found sourceProcessId: " << share.sourceProcessId << std::endl;
     std::cout << "Found sourceProcessShareHandle: " << share.sourceProcessShareHandle << std::endl;
     std::cout << "Obtained localShareHandle: " << localShareHandle << std::endl;
 
     // Load D3D Library
-    SharedLibraryLoader d3d11dll{ "d3d11.dll" };
+    cpputils::SharedLibraryLoader d3d11dll{ "d3d11.dll" };
     if (!d3d11dll.valid()) {
         std::cerr << "ERROR initDirect3D() Unable to load d3d11.dll" << std::endl;
         exit(EXIT_FAILURE);

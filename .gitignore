@@ -4,3 +4,6 @@ Producer/.vs
 Consumer/x64
 Consumer/.vs
 Consumer/Consumer
+build/vs2022Producer
+bin
+build/vs2022Consumer

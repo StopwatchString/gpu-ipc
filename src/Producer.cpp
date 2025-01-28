@@ -3,7 +3,7 @@
 #include "glh/glh.h"
 
 #include "cpputils/SharedMemory.h"
-#include "OpenGLApplication.h"
+#include "glh/classes/OpenGLApplication.h"
 
 #include <iostream>
 #include <chrono>
@@ -118,7 +118,7 @@ void draw(GLFWwindow* window) {
     share.sourceProcessId = GetCurrentProcessId();
     share.sourceProcessShareHandle = d3dTex.d3dTextureSharedResourceHandle();
     share.ready = true;
-    SharedMemory d3dshare("d3dshare", sizeof(d3dshare));
+    cpputils::SharedMemory d3dshare("d3dshare", sizeof(d3dshare));
     memcpy(d3dshare.data(), &share, sizeof(d3dshare));
     std::cout << "Published sourceProcessId: " << share.sourceProcessId << std::endl;
     std::cout << "Published sourceProcessShareHandle: " << share.sourceProcessShareHandle << std::endl;
