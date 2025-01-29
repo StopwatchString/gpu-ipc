@@ -16,7 +16,6 @@
 #include <numeric>
 
 OpenGLApplication::ApplicationConfig appConfig{};
-
 constexpr int MOVE_FACTOR = 100;
 constexpr int FRAMETIME_ROLLING_AVG_SAMPLE_SIZE = 100;
 
@@ -329,10 +328,18 @@ int main(int argc, char argv[])
     appConfig.windowResizeEnable = false;
     appConfig.windowDarkmode = true;
     appConfig.windowRounded = true;
+    appConfig.windowAlwaysOnTop = false;
+    appConfig.vsyncEnable = true;
+    appConfig.transparentFramebuffer = false;
     appConfig.glVersionMajor = 4;
     appConfig.glVersionMinor = 6;
-    appConfig.customDrawFunc = &draw;
-    appConfig.customKeyCallback = &keyCallback;
+    appConfig.glslVersionString = "#version 460"; // Used for DearImgui, leave default unless you know what to put here
+    appConfig.imguiIniFileName = nullptr;
+    appConfig.customDrawFunc = draw;           // std::function<void(GLFWwindow*)>
+    appConfig.customKeyCallback = keyCallback; // std::function<void(GLFWwindow* window, int key, int scancode, int action, int mods)>
+    appConfig.customErrorCallback = nullptr;   // std::function<void(int error_code, const char* description)>
+    appConfig.customDropCallback = nullptr;    // std::function<void(GLFWwindow* window, int count, const char** paths)>
+    appConfig.customPollingFunc = nullptr;     // std::function<void()>
 
     try {
         OpenGLApplication application(appConfig);
