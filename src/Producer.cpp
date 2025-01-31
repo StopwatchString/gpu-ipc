@@ -199,7 +199,7 @@ int main(int argc, char argv[])
     appConfig.glVersionMajor = 4;
     appConfig.glVersionMinor = 6;
     appConfig.glslVersionString = "#version 460"; // Used for DearImgui, leave default unless you know what to put here
-    appConfig.imguiIniFileName = nullptr;
+    appConfig.imguiIniFileName = nullptr;      // If nullptr no file
     appConfig.customDrawFunc = draw;           // std::function<void(GLFWwindow*)>
     appConfig.customKeyCallback = keyCallback; // std::function<void(GLFWwindow* window, int key, int scancode, int action, int mods)>
     appConfig.customErrorCallback = nullptr;   // std::function<void(int error_code, const char* description)>
