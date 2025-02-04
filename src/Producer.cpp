@@ -17,28 +17,31 @@ constexpr int FRAMETIME_ROLLING_AVG_SAMPLE_SIZE = 100;
 
 float size = 20.0f;
 
-class KeyState {
+class KeyState
+{
 public:
     KeyState(int inKey) : key(inKey) {}
-    void update(int inKey, int inAction) {
+    void update(int inKey, int inAction)
+    {
         if (key == inKey) {
-            if (inAction == GLFW_PRESS) {
-                active = true;
-            }
+            if (inAction == GLFW_PRESS) { active = true; }
             else if (inAction == GLFW_RELEASE) {
                 active = false;
             }
         }
     }
-    bool isActive() { return active; }
+    bool isActive() const
+    {
+        return active;
+    }
 
 private:
     int key;
     bool active;
 };
 
-void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
-
+void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
+{
     static KeyState left(GLFW_KEY_LEFT);
     static KeyState right(GLFW_KEY_RIGHT);
     static KeyState up(GLFW_KEY_UP);
@@ -54,19 +57,14 @@ void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int 
     bool alt = mods & GLFW_MOD_ALT;
     bool noMod = !ctrl && !shift && !alt;
 
-
-    if (key == GLFW_KEY_ESCAPE && (action == GLFW_PRESS)) {
-        glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE);
-    }
+    if (key == GLFW_KEY_ESCAPE && (action == GLFW_PRESS)) { glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE); }
 
     if (left.isActive() && shift) {
         size -= 2.0f;
         if (size < 1.0f) size = 2.0f;
     }
 
-    if (right.isActive() && shift) {
-        size += 2.0f;
-    }
+    if (right.isActive() && shift) { size += 2.0f; }
 
     if (left.isActive() && ctrl) {
         int xPos, yPos;
@@ -93,19 +91,22 @@ void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int 
     }
 }
 
-std::string doubleToString(double val, size_t precision) {
+std::string doubleToString(double val, size_t precision)
+{
     std::string str = std::to_string(val);
     int dec = str.find('.');
     return str.substr(0, dec + precision + 1);
 }
 
-struct d3dshare {
-    DWORD sourceProcessId{ NULL };
-    HANDLE sourceProcessShareHandle{ NULL };
-    bool ready{ false };
+struct d3dshare
+{
+    DWORD sourceProcessId{NULL};
+    HANDLE sourceProcessShareHandle{NULL};
+    bool ready{false};
 };
 
-void draw(GLFWwindow* window) {
+void draw(GLFWwindow* window)
+{
     glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
 
@@ -132,7 +133,7 @@ void draw(GLFWwindow* window) {
         glhClearColor(0.2f, 0.3f, 0.4f, 1.0f);
         glhClear(GL_COLOR_BUFFER_BIT);
 
-        float sinVal = sinf((float)glfwGetTime()*5.0f) * 0.5f + 0.5f;
+        float sinVal = sinf((float)glfwGetTime() * 5.0f) * 0.5f + 0.5f;
         glhBegin(GL_TRIANGLES);
 
         glColor4d(1.0f, sinVal, 0.0f, 1.0f);
@@ -153,7 +154,7 @@ void draw(GLFWwindow* window) {
         double frametimeMsAvg = total / frametimeMsTimings.size();
         std::string frametimeStr = doubleToString(frametimeMsAvg, 2) + " frametime (ms)";
         glhDrawText(frametimeStr, 0, timeRect.height, size);
-        
+
         std::string moveText = "Ctrl+Arrow Keys to move window";
         FontRect moveTextRect = glhGetTextSize(moveText, size);
         glhDrawText(moveText, appConfig.windowInitWidth - moveTextRect.width, 0, size);
@@ -199,12 +200,13 @@ int main(int argc, char argv[])
     appConfig.glVersionMajor = 4;
     appConfig.glVersionMinor = 6;
     appConfig.glslVersionString = "#version 460"; // Used for DearImgui, leave default unless you know what to put here
-    appConfig.imguiIniFileName = nullptr;      // If nullptr no file
-    appConfig.customDrawFunc = draw;           // std::function<void(GLFWwindow*)>
-    appConfig.customKeyCallback = keyCallback; // std::function<void(GLFWwindow* window, int key, int scancode, int action, int mods)>
-    appConfig.customErrorCallback = nullptr;   // std::function<void(int error_code, const char* description)>
-    appConfig.customDropCallback = nullptr;    // std::function<void(GLFWwindow* window, int count, const char** paths)>
-    appConfig.customPollingFunc = nullptr;     // std::function<void()>
+    appConfig.imguiIniFileName = nullptr;         // If nullptr no file
+    appConfig.customDrawFunc = draw;              // std::function<void(GLFWwindow*)>
+    appConfig.customKeyCallback
+        = keyCallback; // std::function<void(GLFWwindow* window, int key, int scancode, int action, int mods)>
+    appConfig.customErrorCallback = nullptr; // std::function<void(int error_code, const char* description)>
+    appConfig.customDropCallback = nullptr;  // std::function<void(GLFWwindow* window, int count, const char** paths)>
+    appConfig.customPollingFunc = nullptr;   // std::function<void()>
 
     try {
         OpenGLApplication application(appConfig);
