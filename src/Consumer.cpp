@@ -314,7 +314,6 @@ void draw(GLFWwindow* window) {
         glfwSwapBuffers(window);
     }
     glhFreeFont();
-    D3DInteropTexture2D::shutdownDirect3D();
 }
 
 int main(int argc, char argv[])
