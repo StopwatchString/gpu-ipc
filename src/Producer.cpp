@@ -110,10 +110,11 @@ void draw(GLFWwindow* window)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
 
-    D3DInteropTexture2D::initDirect3D();
+    Direct3DContext d3dContext = createDirect3DContext();
+
     glhInitFont(appConfig.windowInitWidth, appConfig.windowInitHeight);
 
-    D3DInteropTexture2D d3dTex(appConfig.windowInitWidth, appConfig.windowInitHeight, false);
+    D3DInteropTexture2D d3dTex(appConfig.windowInitWidth, appConfig.windowInitHeight, false, d3dContext);
 
     d3dshare share;
     share.sourceProcessId = GetCurrentProcessId();
@@ -180,7 +181,7 @@ void draw(GLFWwindow* window)
         glfwSwapBuffers(window);
     }
     glhFreeFont();
-    D3DInteropTexture2D::shutdownDirect3D();
+    destroyDirect3DContext(d3dContext);
 }
 
 int main(int argc, char argv[])
@@ -199,7 +200,7 @@ int main(int argc, char argv[])
     appConfig.transparentFramebuffer = false;
     appConfig.glVersionMajor = 4;
     appConfig.glVersionMinor = 6;
-    appConfig.glslVersionString = "#version 460"; // Used for DearImgui, leave default unless you know what to put here
+    appConfig.dearImguiGlslVersionString = "#version 460"; // Used for DearImgui, leave default unless you know what to put here
     appConfig.imguiIniFileName = nullptr;         // If nullptr no file
     appConfig.customDrawFunc = draw;              // std::function<void(GLFWwindow*)>
     appConfig.customKeyCallback
