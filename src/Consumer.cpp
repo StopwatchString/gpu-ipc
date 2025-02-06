@@ -138,73 +138,10 @@ void draw(GLFWwindow* window) {
     std::cout << "Found sourceProcessShareHandle: " << share.sourceProcessShareHandle << std::endl;
     std::cout << "Obtained localShareHandle: " << localShareHandle << std::endl;
 
-    // Load D3D Library
-    cpputils::SharedLibraryLoader d3d11dll{ "d3d11.dll" };
-    if (!d3d11dll.valid()) {
-        std::cerr << "ERROR initDirect3D() Unable to load d3d11.dll" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    // Get the function pointer for D3D11CreateDevice from the loaded D3D library
-    PFN_D3D11_CREATE_DEVICE D3D11CreateDevicePtr = (PFN_D3D11_CREATE_DEVICE)d3d11dll.loadFunctionPointer("D3D11CreateDevice");
-    if (D3D11CreateDevicePtr == NULL) {
-        std::cerr << "ERROR initDirect3D() Could not GetProcAddress of D3D11CreateDevice" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    // Use D3D11CreateDevice() to make a D3DDevice and D3DDeviceContext
-    Microsoft::WRL::ComPtr<ID3D11Device> d3dDevice = nullptr;
-    Microsoft::WRL::ComPtr<ID3D11DeviceContext> d3dDeviceContext = nullptr;
-    const bool directxDebugFlag = false;
-    const UINT deviceFlags =
-        D3D11_CREATE_DEVICE_PREVENT_INTERNAL_THREADING_OPTIMIZATIONS | // no separate D3D11 worker thread
-        (directxDebugFlag ? D3D11_CREATE_DEVICE_DEBUG : 0) | // useful for diagnosing DX failures
-        D3D11_CREATE_DEVICE_SINGLETHREADED;
-    const std::vector<D3D_FEATURE_LEVEL> featureLevel = { D3D_FEATURE_LEVEL_11_1 };
-    HRESULT hr = D3D11CreateDevicePtr(
-        NULL,                       // pAdapter           | Video Adapter, NULL = default
-        D3D_DRIVER_TYPE_HARDWARE,   // DriverType         | TYPE_HARDWARE specifies a device that implements D3D in hardware
-        NULL,                       // Software           | Indicates what software renderer to use when Driver Type is Software
-        deviceFlags,                // Flags              | Runtime layers to enable https://learn.microsoft.com/en-us/windows/win32/api/d3d11/ne-d3d11-d3d11_create_device_flag
-        featureLevel.data(),        // pFeatureLevels     | Pointer to an array of D3D Feature Levels https://learn.microsoft.com/en-us/windows/win32/api/d3dcommon/ne-d3dcommon-d3d_feature_level
-        (UINT)featureLevel.size(),  // FeatureLevels      | Number of specified feature levels
-        D3D11_SDK_VERSION,          // SDK Version        | Use D3D11_SDK_VERSION
-        &d3dDevice,                 // ppDevice           | Holds address to pointer to device created
-        NULL,                       // pFeatureLevel      | Can check for supported feature levels. NULL means don't check
-        &d3dDeviceContext           // ppImmediateContext | Holds address to pointer to the ID3D11DeviceContext
-    );
-    if (hr != S_OK) {
-        std::cerr << "ERROR initDirect3D() D3D11CreateDevicePtr failed!" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    // Cast d3dDevice and d3dDeviceContext into their 11.1 variants
-    if (!SUCCEEDED(d3dDevice.As(&d3dDevice1))) {
-        std::cerr << "ERROR initDirect3D() Could not cast D3D11 device into its D3D11.1 counterpart!" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    if (!SUCCEEDED(d3dDeviceContext.As(&d3dDeviceContext1))) {
-        std::cerr << "ERROR initDirect3D() Could not cast D3D11 device context into its D3D11.1 counterpart!" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    // Check that resource sharing is available
-    D3D11_FEATURE_DATA_D3D11_OPTIONS opts;
-    d3dDevice1->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &opts, sizeof(opts));
-    if (opts.ExtendedResourceSharing != 1) {
-        std::cout << "ERROR initDirect3D() DirectX Feature ExtendedResourceSharing is not supported." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    // Create WGL interop device
-    hWglD3DDevice = wglDXOpenDeviceNV(d3dDevice1.Get());
-    if (hWglD3DDevice == NULL) {
-        std::cerr << "ERROR initDirect3D() wglDXOpenDeviceNV failed!" << std::endl;
-        exit(EXIT_FAILURE);
-    }
+    Direct3DContext d3dContext = createDirect3DContext();
 
     ID3D11Texture2D* importedTexture = nullptr;
-    hr = d3dDevice1->OpenSharedResource1(
+    HRESULT hr = d3dContext.d3dDevice1->OpenSharedResource1(
         localShareHandle,
         __uuidof(ID3D11Texture2D),
         reinterpret_cast<void**>(&importedTexture)
