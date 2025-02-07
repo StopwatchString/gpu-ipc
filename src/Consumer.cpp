@@ -6,9 +6,7 @@
 #include "cpputils/SharedMemory.h"
 #include "cpputils/SharedLibraryLoader.h"
 #include "cpputils/windows/handle_utils.h"
-
-#include <D3D11_1.h>
-#include <wrl/client.h> // for Microsoft::WRL::ComPtr template
+#include "glh/directXInterop/D3DInteropTexture2D.h"
 
 #include <iostream>
 #include <chrono>
@@ -21,10 +19,12 @@ constexpr int FRAMETIME_ROLLING_AVG_SAMPLE_SIZE = 100;
 
 float size = 20.0f;
 
-class KeyState {
+class KeyState
+{
 public:
     KeyState(int inKey) : key(inKey) {}
-    void update(int inKey, int inAction) {
+    void update(int inKey, int inAction)
+    {
         if (key == inKey) {
             if (inAction == GLFW_PRESS) {
                 active = true;
@@ -42,8 +42,8 @@ private:
 };
 
 bool doRotation = true;
-void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
-
+void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
+{
     static KeyState left(GLFW_KEY_LEFT);
     static KeyState right(GLFW_KEY_RIGHT);
     static KeyState up(GLFW_KEY_UP);
@@ -59,7 +59,6 @@ void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int 
     bool alt = mods & GLFW_MOD_ALT;
     bool noMod = !ctrl && !shift && !alt;
 
-
     if (key == GLFW_KEY_ESCAPE && (action == GLFW_PRESS)) {
         glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE);
     }
@@ -70,7 +69,8 @@ void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int 
 
     if (left.isActive() && shift) {
         size -= 2.0f;
-        if (size < 1.0f) size = 2.0f;
+        if (size < 1.0f)
+            size = 2.0f;
     }
 
     if (right.isActive() && shift) {
@@ -102,24 +102,29 @@ void keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int 
     }
 }
 
-std::string doubleToString(double val, size_t precision) {
+std::string doubleToString(double val, size_t precision)
+{
     std::string str = std::to_string(val);
     int dec = str.find('.');
     return str.substr(0, dec + precision + 1);
 }
 
-struct d3dshare {
-    DWORD sourceProcessId{ NULL };
-    HANDLE sourceProcessShareHandle{ NULL };
-    bool ready{ false };
+struct d3dshare
+{
+    DWORD sourceProcessId{NULL};
+    HANDLE sourceProcessShareHandle{NULL};
+    bool ready{false};
 };
 
-void draw(GLFWwindow* window) {
+void draw(GLFWwindow* window)
+{
     glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
 
     glhInitFont(appConfig.windowInitWidth, appConfig.windowInitHeight);
+    Direct3DContext d3dContext = createDirect3DContext();
 
+    // Get shared handle from Producer process
     d3dshare share;
     while (!share.ready) {
         cpputils::SharedMemory d3dshare("d3dshare", sizeof(d3dshare));
@@ -134,49 +139,12 @@ void draw(GLFWwindow* window) {
     std::cout << "Found sourceProcessShareHandle: " << share.sourceProcessShareHandle << std::endl;
     std::cout << "Obtained localShareHandle: " << localShareHandle << std::endl;
 
-    Direct3DContext d3dContext = createDirect3DContext();
-
-    ID3D11Texture2D* importedTexture = nullptr;
-    HRESULT hr = d3dContext.d3dDevice1->OpenSharedResource1(
-        localShareHandle,
-        __uuidof(ID3D11Texture2D),
-        reinterpret_cast<void**>(&importedTexture)
-    );
-    if (hr != S_OK) {
-        std::cout << "Failed to open imported texture" << std::endl;
-    }
-
-    // Associate the D3DTexture with the generated resource handle
-    if (!wglDXSetResourceShareHandleNV(importedTexture, localShareHandle)) {
-        std::cerr << "ERROR createSharedTexture() wglDXSetResourceShareHandleNV() failed!" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    // Make the OpenGL Texture
-    GLuint openglTex;
-    glGenTextures(1, &openglTex);
-
-    // This lock synchronizes control of the texture between D3D and OpenGL
-    // You *must* lock and unlock this resource when using the texture in OpenGL for any operation.
-    // TBD for DirectX operations.
-    HANDLE textureLock = wglDXRegisterObjectNV(
-        d3dContext.hWglD3DDevice,            // hDevice  | 
-        importedTexture,             // dxObject | 
-        openglTex,      // name     | 
-        GL_TEXTURE_2D,            // type     | 
-        WGL_ACCESS_READ_WRITE_NV  // access   | 
-    );
-    if (textureLock == NULL) {
-        std::cerr << "wglDXRegisterObjectNV failed" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
-    glhTextureParameteri(openglTex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glhTextureParameteri(openglTex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // Import the shared texture
+    D3DInteropTexture2D importedTexture(localShareHandle, d3dContext);
 
     glEnable(GL_TEXTURE_2D);
     size_t writeIndex = 0;
-    std::array<double, FRAMETIME_ROLLING_AVG_SAMPLE_SIZE> frametimeMsTimings;
+    std::array<double, FRAMETIME_ROLLING_AVG_SAMPLE_SIZE> frametimeMsTimings{0.0};
 
     while (!glfwWindowShouldClose(window)) {
         auto begin = std::chrono::high_resolution_clock::now();
@@ -184,8 +152,8 @@ void draw(GLFWwindow* window) {
         glhClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glhClear(GL_COLOR_BUFFER_BIT);
 
-        wglDXLockObjectsNV(d3dContext.hWglD3DDevice, 1, &textureLock);
-        glhBindTexture(GL_TEXTURE_2D, openglTex);
+        importedTexture.interopLock();
+        importedTexture.bind();
 
         glPushMatrix();
 
@@ -211,28 +179,12 @@ void draw(GLFWwindow* window) {
 
         glPopMatrix();
 
-        wglDXUnlockObjectsNV(d3dContext.hWglD3DDevice, 1, &textureLock);
+        importedTexture.interopUnlock();
 
         std::string controlStr = "Press space to toggle rotation";
         FontRect fontrect = glhGetTextSize(controlStr, 20.0f);
         glhSetTextColor(1.0f, 0.0f, 0.0f, 1.0f);
         glhDrawText(controlStr, 0, appConfig.windowInitHeight - fontrect.height, 20.0f);
-
-        //std::string timeStr = doubleToString(glfwGetTime(), 2) + "s";
-        //FontRect timeRect = glhDrawText(timeStr, 0, 0, size);
-
-        //double total = std::accumulate(std::begin(frametimeMsTimings), std::end(frametimeMsTimings), 0);
-        //double frametimeMsAvg = total / frametimeMsTimings.size();
-        //std::string frametimeStr = doubleToString(frametimeMsAvg, 2) + " frametime (ms)";
-        //glhDrawText(frametimeStr, 0, timeRect.height, size);
-        //
-        //std::string moveText = "Ctrl+Arrow Keys to move window";
-        //FontRect moveTextRect = glhGetTextSize(moveText, size);
-        //glhDrawText(moveText, appConfig.windowInitWidth - moveTextRect.width, 0, size);
-
-        //std::string scaleText = "Shift+Arrow Keys to scale text";
-        //FontRect scaleTextRect = glhGetTextSize(scaleText, size);
-        //glhDrawText(scaleText, appConfig.windowInitWidth - scaleTextRect.width, moveTextRect.height, size);
 
         glhErrorCheck("End of Render");
 
@@ -265,13 +217,15 @@ int main(int argc, char argv[])
     appConfig.transparentFramebuffer = false;
     appConfig.glVersionMajor = 4;
     appConfig.glVersionMinor = 6;
-    appConfig.dearImguiGlslVersionString = "#version 460"; // Used for DearImgui, leave default unless you know what to put here
+    appConfig.dearImguiGlslVersionString
+        = "#version 460"; // Used for DearImgui, leave default unless you know what to put here
     appConfig.imguiIniFileName = nullptr;
-    appConfig.customDrawFunc = draw;           // std::function<void(GLFWwindow*)>
-    appConfig.customKeyCallback = keyCallback; // std::function<void(GLFWwindow* window, int key, int scancode, int action, int mods)>
-    appConfig.customErrorCallback = nullptr;   // std::function<void(int error_code, const char* description)>
-    appConfig.customDropCallback = nullptr;    // std::function<void(GLFWwindow* window, int count, const char** paths)>
-    appConfig.customPollingFunc = nullptr;     // std::function<void()>
+    appConfig.customDrawFunc = draw; // std::function<void(GLFWwindow*)>
+    appConfig.customKeyCallback
+        = keyCallback; // std::function<void(GLFWwindow* window, int key, int scancode, int action, int mods)>
+    appConfig.customErrorCallback = nullptr; // std::function<void(int error_code, const char* description)>
+    appConfig.customDropCallback = nullptr;  // std::function<void(GLFWwindow* window, int count, const char** paths)>
+    appConfig.customPollingFunc = nullptr;   // std::function<void()>
 
     try {
         OpenGLApplication application(appConfig);
