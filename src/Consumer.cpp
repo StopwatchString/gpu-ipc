@@ -114,10 +114,6 @@ struct d3dshare {
     bool ready{ false };
 };
 
-Microsoft::WRL::ComPtr<ID3D11Device1> d3dDevice1 = nullptr;
-Microsoft::WRL::ComPtr<ID3D11DeviceContext1> d3dDeviceContext1 = nullptr;
-HANDLE hWglD3DDevice = NULL;
-
 void draw(GLFWwindow* window) {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
@@ -164,7 +160,7 @@ void draw(GLFWwindow* window) {
     // You *must* lock and unlock this resource when using the texture in OpenGL for any operation.
     // TBD for DirectX operations.
     HANDLE textureLock = wglDXRegisterObjectNV(
-        hWglD3DDevice,            // hDevice  | 
+        d3dContext.hWglD3DDevice,            // hDevice  | 
         importedTexture,             // dxObject | 
         openglTex,      // name     | 
         GL_TEXTURE_2D,            // type     | 
@@ -188,7 +184,7 @@ void draw(GLFWwindow* window) {
         glhClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glhClear(GL_COLOR_BUFFER_BIT);
 
-        wglDXLockObjectsNV(hWglD3DDevice, 1, &textureLock);
+        wglDXLockObjectsNV(d3dContext.hWglD3DDevice, 1, &textureLock);
         glhBindTexture(GL_TEXTURE_2D, openglTex);
 
         glPushMatrix();
@@ -215,7 +211,7 @@ void draw(GLFWwindow* window) {
 
         glPopMatrix();
 
-        wglDXUnlockObjectsNV(hWglD3DDevice, 1, &textureLock);
+        wglDXUnlockObjectsNV(d3dContext.hWglD3DDevice, 1, &textureLock);
 
         std::string controlStr = "Press space to toggle rotation";
         FontRect fontrect = glhGetTextSize(controlStr, 20.0f);
