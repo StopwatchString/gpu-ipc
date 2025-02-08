@@ -140,7 +140,8 @@ void draw(GLFWwindow* window)
     std::cout << "Obtained localShareHandle: " << localShareHandle << std::endl;
 
     // Import the shared texture
-    D3DInteropTexture2D importedTexture(localShareHandle, d3dContext);
+    glh::d3dinterop::D3DInteropTexture importedTexture
+        = glh::d3dinterop::openD3DInteropTexture(localShareHandle, d3dContext);
 
     glEnable(GL_TEXTURE_2D);
     size_t writeIndex = 0;
@@ -152,8 +153,8 @@ void draw(GLFWwindow* window)
         glhClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glhClear(GL_COLOR_BUFFER_BIT);
 
-        importedTexture.interopLock();
-        importedTexture.bind();
+        glh::d3dinterop::interopLock(importedTexture, d3dContext);
+        glhBindTexture(GL_TEXTURE_2D, importedTexture.openGLTextureName);
 
         glPushMatrix();
 
@@ -179,7 +180,7 @@ void draw(GLFWwindow* window)
 
         glPopMatrix();
 
-        importedTexture.interopUnlock();
+        glh::d3dinterop::interopUnlock(importedTexture, d3dContext);
 
         std::string controlStr = "Press space to toggle rotation";
         FontRect fontrect = glhGetTextSize(controlStr, 20.0f);

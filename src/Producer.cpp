@@ -112,13 +112,18 @@ void draw(GLFWwindow* window)
 
     Direct3DContext d3dContext = createDirect3DContext();
 
-    glhInitFont(appConfig.windowInitWidth, appConfig.windowInitHeight);
+    glh::d3dinterop::D3DInteropTextureCreateInfo createInfo;
+    createInfo.width = appConfig.windowInitWidth;
+    createInfo.height = appConfig.windowInitHeight;
+    createInfo.useMipmaps = false;
+    glh::d3dinterop::D3DInteropTexture interopTexture
+        = glh::d3dinterop::createD3DInteropTexture(createInfo, d3dContext);
 
-    D3DInteropTexture2D d3dTex(appConfig.windowInitWidth, appConfig.windowInitHeight, false, d3dContext);
+    glhInitFont(appConfig.windowInitWidth, appConfig.windowInitHeight);
 
     d3dshare share;
     share.sourceProcessId = GetCurrentProcessId();
-    share.sourceProcessShareHandle = d3dTex.d3dTextureSharedResourceHandle();
+    share.sourceProcessShareHandle = interopTexture.hDxTextureSharedResource;
     share.ready = true;
     cpputils::SharedMemory d3dshare("d3dshare", sizeof(d3dshare));
     memcpy(d3dshare.data(), &share, sizeof(d3dshare));
@@ -164,9 +169,9 @@ void draw(GLFWwindow* window)
         FontRect scaleTextRect = glhGetTextSize(scaleText, size);
         glhDrawText(scaleText, appConfig.windowInitWidth - scaleTextRect.width, moveTextRect.height, size);
 
-        d3dTex.interopLock();
-        glCopyTextureSubImage2D(d3dTex.openGLHandle(), 0, 0, 0, 0, 0, d3dTex.width(), d3dTex.height());
-        d3dTex.interopUnlock();
+        glh::d3dinterop::interopLock(interopTexture, d3dContext);
+        glCopyTextureSubImage2D(interopTexture.openGLTextureName, 0, 0, 0, 0, 0, interopTexture.width, interopTexture.height);
+        glh::d3dinterop::interopUnlock(interopTexture, d3dContext);
 
         glhErrorCheck("End of Render");
 
