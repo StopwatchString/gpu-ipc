@@ -54,6 +54,15 @@ target_include_directories(
 )
 
 ## External project linkage would go here
+add_subdirectory("external/glh")
+
+add_subdirectory("external/cpputils")
+
+target_link_libraries(
+    ${TARGET_NAME}_lib
+    PUBLIC glh_lib
+    PUBLIC cpputils_lib
+)
 
 # ------------- PROJECT EXECUTABLE -------------
 add_executable(${TARGET_NAME}_Producer src/main/Producer.cpp)
@@ -109,7 +118,10 @@ if (MSVC)
     target_compile_options(${TARGET_NAME}_lib PRIVATE /MP)
     target_compile_options(${TARGET_NAME}_Producer PRIVATE /MP)
     target_compile_options(${TARGET_NAME}_Consumer PRIVATE /MP)
-    target_compile_options(${TARGET_NAME}_tests PRIVATE /MP)
+
+    if (${TARGET_NAME}_BUILD_TESTS)
+        target_compile_options(${TARGET_NAME}_tests PRIVATE /MP)
+    endif()
 
     # Provides folder tree in visual studio filters
     source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src PREFIX "Source Files" FILES ${SOURCES})

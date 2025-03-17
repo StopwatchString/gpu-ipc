@@ -1,3 +1,6 @@
 [submodule "external/glh"]
 	path = external/glh
 	url = https://github.com/StopwatchString/glh.git
+[submodule "external/cpputils"]
+	path = external/cpputils
+	url = https://github.com/StopwatchString/cpputils.git
