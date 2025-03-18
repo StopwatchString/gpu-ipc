@@ -1,0 +1,32 @@
+{
+    "version": 3,
+    "configurePresets": [
+      {
+        "name": "default",
+        "generator": "Visual Studio 17 2022",
+        "binaryDir": "${sourceDir}/build",
+        "cacheVariables": {
+            // CMAKE Core
+            "BUILD_SHARED_LIBS":          "OFF",
+            // GLFW
+          "USE_MSVC_RUNTIME_LIBRARY_DLL": "ON",
+          "GLFW_BUILD_DOCS":              "OFF",
+          "GLFW_BUILD_EXAMPLES":          "OFF",
+          "GLFW_BUILD_TESTS":             "OFF",
+          "GLFW_BUILD_WIN32":             "ON",
+          "GLFW_INSTALL":                 "OFF",
+          "GLFW_LIBRARY_TYPE":            "",
+          "GLFW_USE_HYBRID_HPG":          "OFF",
+          // cpputils
+          "cpputils_BUILD_EXAMPLES":      "OFF",
+          "cpputils_BUILD_TESTS":         "OFF",
+          // glh
+          "glh_BUILD_EXAMPLES":           "OFF",
+          "glh_BUILD_TESTS":              "OFF",
+          // gpu_ipc
+          "gpu_ipc_BUILD_EXAMPLES":       "OFF",
+          "gpu_ipc_BUILD_TESTS":          "OFF"
+        }
+      }
+    ]
+  }
