@@ -2,11 +2,11 @@
 #include "GLFW/glfw3.h"
 #include "glh/glh.h"
 
-#include "glh/classes/OpenGLApplication.h"
+#include "glh/OpenGLApplication.h"
 #include "cpputils/SharedMemory.h"
 #include "cpputils/SharedLibraryLoader.h"
 #include "cpputils/windows/handle_utils.h"
-#include "glh/directXInterop/D3DInteropTexture2D.h"
+#include "glh/D3DInteropTexture2D.h"
 
 #include <iostream>
 #include <chrono>
@@ -121,7 +121,6 @@ void draw(GLFWwindow* window)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
 
-    glhInitFont(appConfig.windowInitWidth, appConfig.windowInitHeight);
     Direct3DContext d3dContext = createDirect3DContext();
 
     // Get shared handle from Producer process
@@ -182,11 +181,6 @@ void draw(GLFWwindow* window)
 
         glh::d3dinterop::interopUnlock(importedTexture, d3dContext);
 
-        std::string controlStr = "Press space to toggle rotation";
-        FontRect fontrect = glhGetTextSize(controlStr, 20.0f);
-        glhSetTextColor(1.0f, 0.0f, 0.0f, 1.0f);
-        glhDrawText(controlStr, 0, appConfig.windowInitHeight - fontrect.height, 20.0f);
-
         glhErrorCheck("End of Render");
 
         auto end = std::chrono::high_resolution_clock::now();
@@ -199,7 +193,6 @@ void draw(GLFWwindow* window)
 
         glfwSwapBuffers(window);
     }
-    glhFreeFont();
 }
 
 int main(int argc, char argv[])

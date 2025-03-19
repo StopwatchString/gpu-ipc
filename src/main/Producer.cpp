@@ -3,7 +3,7 @@
 #include "glh/glh.h"
 
 #include "cpputils/SharedMemory.h"
-#include "glh/classes/OpenGLApplication.h"
+#include "glh/OpenGLApplication.h"
 
 #include <iostream>
 #include <chrono>
@@ -119,8 +119,6 @@ void draw(GLFWwindow* window)
     glh::d3dinterop::D3DInteropTexture interopTexture
         = glh::d3dinterop::createD3DInteropTexture(createInfo, d3dContext);
 
-    glhInitFont(appConfig.windowInitWidth, appConfig.windowInitHeight);
-
     d3dshare share;
     share.sourceProcessId = GetCurrentProcessId();
     share.sourceProcessShareHandle = interopTexture.hDxTextureSharedResource;
@@ -153,22 +151,6 @@ void draw(GLFWwindow* window)
 
         glhEnd();
 
-        std::string timeStr = doubleToString(glfwGetTime(), 2) + "s";
-        FontRect timeRect = glhDrawText(timeStr, 0, 0, size);
-
-        double total = std::accumulate(std::begin(frametimeMsTimings), std::end(frametimeMsTimings), 0);
-        double frametimeMsAvg = total / frametimeMsTimings.size();
-        std::string frametimeStr = doubleToString(frametimeMsAvg, 2) + " frametime (ms)";
-        glhDrawText(frametimeStr, 0, timeRect.height, size);
-
-        std::string moveText = "Ctrl+Arrow Keys to move window";
-        FontRect moveTextRect = glhGetTextSize(moveText, size);
-        glhDrawText(moveText, appConfig.windowInitWidth - moveTextRect.width, 0, size);
-
-        std::string scaleText = "Shift+Arrow Keys to scale text";
-        FontRect scaleTextRect = glhGetTextSize(scaleText, size);
-        glhDrawText(scaleText, appConfig.windowInitWidth - scaleTextRect.width, moveTextRect.height, size);
-
         glh::d3dinterop::interopLock(interopTexture, d3dContext);
         glCopyTextureSubImage2D(interopTexture.openGLTextureName, 0, 0, 0, 0, 0, interopTexture.width, interopTexture.height);
         glh::d3dinterop::interopUnlock(interopTexture, d3dContext);
@@ -185,7 +167,6 @@ void draw(GLFWwindow* window)
 
         glfwSwapBuffers(window);
     }
-    glhFreeFont();
     destroyDirect3DContext(d3dContext);
 }
 
